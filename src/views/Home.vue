@@ -1,78 +1,100 @@
 <template>
   <div class="home">
-    <!-- name.value and age.value will be automatically used in the template -->
-    <p ref="refP">Name: {{ name }}, Age: {{ age }}</p>
+    <h1>Home</h1>
 
-    <button @click="handleClick">Click me!</button>
-    <button @click="++age" style="margin-left: 4px;">Increase age</button>
+    <!-- <h2>Refs</h2>
+    <p>{{ person.name }} - {{  person.age }}</p>
+    <button @click="updatePerson">Update Person</button>
 
-    <!-- name in the input field will be updated in the DOM -->
-    <input type="text" style="margin-left: 4px;" v-model="name">
+    <h2>Reactive</h2>
+    <p>{{ person2.name }} - {{  person2.age }}</p>
+    <button @click="updatePerson2">Update Person2</button> -->
+
+    <!-- <p>{{ name }}</p> -->
+
+    <input type="text" v-model="search"> 
+    <p>Search term: {{ search }}</p>
+    <div v-for="name in matchingNames" :key="name">
+      {{ name }}
+    </div>
+    <button @click="handleClick">Stop watching</button>
 
   </div>
 </template>
 
 <script>
-import { ref } from 'vue'
-
-// @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue'
+// import { ref, reactive } from 'vue'
+import { ref, computed, watch, watchEffect } from 'vue'
 
 export default {
   name: 'Home',
-  
-  // 1st order
+
   setup() {
-    // values in setup are not reactive values
-       
-    // let name_in_setup = 'ta2lsm'
-    // let age_in_setup = 39
-    // return { name: name_in_setup, age: age_in_setup}
-    
-    // variables (not reactive. they can be changed but will not be updated in the DOM)
-    // let name = 'ta2lsm'
-    // let age = 39
+    // const person = ref({name: 'ta2lsm', age: 39})
+    // const person2 = reactive({name: 'John', age: 15})
 
-    const name = ref('ta2lsm')
-    const age = ref(39)
+    //const name = ref('ta2lsm')    // reactive value
+    //const name2 = reactive('John')    // not a reactive value. reactive expression can not use primitive types of values such a 'John'
 
-    // refs
-    const refP = ref(null)
-    //console.log(refP, refP.value)   // can't use refP before returns it below. refP will be null at this point...
+    // const updatePerson = () => {
+    //   person.value.age = 45
+    // }
 
-    // functions
+    // const updatePerson2 = () => {
+    //   // no need to use "value"
+    //   person2.age = 25
+
+    //   //name2 = 'ninja'   // can not to be updated
+    // }
+
+    // return { person, person2, updatePerson, updatePerson2, name2 }
+    // return { person, person2, updatePerson, updatePerson2 }
+
+    // const name = computed(() => {
+    //   return 'ta2lsm'
+    // })
+
+    // return { name }
+
+    const names = ref(['mario', 'yoshi', 'luigi', 'toad', 'bowser', 'koopa', 'peach',])
+    const search = ref('')
+
+    //  watch hook
+    // watch(search, () => {
+    //   console.log('watch function ran')
+    // })
+
+    // watchEffect(() => {
+    //   // always runs initially
+    //   console.log('watchEffect function ran')
+
+    //   // only runs when search.value changes
+    //   console.log('watchEffect function ran', search.value)
+    // })
+
+    const stopWatch = watch(search, () => {
+      console.log('watch function ran')
+    })
+
+    const stopWatchEffect = watchEffect(() => {
+      // always runs initially
+      console.log('watchEffect function ran')
+
+      // only runs when search.value changes
+      console.log('watchEffect function ran', search.value)
+    })
+
+    // These will stop watching
     const handleClick = () => {
-      // // console.log('Button clicked')
-      // console.log("refP: ", refP)
-      // console.log("refP Value: ", refP.value)
-
-      // refP.value.classList.add('test')                // add class named 'test' to paragraph
-      // refP.value.textContent = 'NEW TEXT CONTENT'     // change paragraph's text content
-
-      // name = 'John'         // this will change value of name but will not be updates in the DOM
-      name.value = 'John'     // if "name" is defined as a ref, when we change its value it will be updated in the DOM also
-      age.value = 18
+      stopWatch()
+      stopWatchEffect()
     }
 
-    return { name, age, handleClick, refP }
-  },
+    const matchingNames = computed( () => {
+      return names.value.filter( (name) => name.includes(search.value))
+    })
 
-  // 2nd order
-  data() {
-    return {
-      // values in data are reactive values. Changes of them will be reflected in template
-      score: 5
-    }
-  },
-
-  // // 3rd order
-  // created() {
-
-  // },
-
-  // // 4th order
-  // mounted() {
-
-  // }
+    return { names, search, matchingNames, handleClick }
+  }
 }
 </script>
